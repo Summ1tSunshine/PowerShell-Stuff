@@ -1,0 +1,14 @@
+Find Windows Defender Exclusion Paths
+$logName = "Microsoft-Windows-Windows Defender/Operational"
+$eventID = 5007
+$events = Get-WinEvent -LogName $logName | Where-Object { $_.Id -eq $eventID }
+$exclusionEvents = $events | Where-Object { $_.Message -match "Exclusions" }
+$pattern = "Paths\\(.+?)\s*=\s*0x"
+$exclusionEvents | ForEach-Object {
+    if ($_.Message -match $pattern) {
+        $matches[1]
+    }
+}
+
+One-liner
+Get-WinEvent -LogName "Microsoft-Windows-Windows Defender/Operational" | Where-Object { $_.Id -eq 5007 -and $_.Message -match "Exclusions" } | ForEach-Object { if ($_.Message -match "Paths\\(.+?)\s*=\s*0x") { $matches[1] } }
